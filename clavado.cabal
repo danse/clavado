@@ -35,3 +35,13 @@ executable clavado-deepest
                        unix
   hs-source-dirs:      src
   default-language:    Haskell2010
+
+executable step
+  main-is:             step.lhs
+  build-depends:       base,
+                       directory,
+                       time,
+                       strict,
+                       filepath,
+                       unix
+  default-language:    Haskell2010
