@@ -1,7 +1,7 @@
 import Data.List
 import System.Posix.Types
 import qualified System.Posix.Files as Files
-import System.FilePath.Find
+import System.FilePath.Find -- from filemanip, using `fold` from here
 import System.Environment
 import Control.Monad
 import Data.Ord
