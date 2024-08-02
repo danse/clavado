@@ -15,12 +15,14 @@ filterPredicate skip = visible &&? notSkip skip -- &&? isDirectory' -- this does
   where notSkip [] = always
         notSkip (a:b) = (fileName /~? a ) &&? notSkip b
 
-folding :: Maybe FileInfo -> FileInfo -> Maybe FileInfo
-folding Nothing current = Just current
-folding (Just best) current
-  | metric best > metric current                 = Just best
-  | not (Files.isDirectory (infoStatus current)) = Just best -- because isDirectory' would not work
-  | otherwise                                    = Just current
+folding :: [FileInfo] -> FileInfo -> [FileInfo]
+folding [] current = [current]
+folding collection@(sample:_) current
+  -- first we exclude files here because isDirectory' would not work
+  | not (Files.isDirectory (infoStatus current)) = collection
+  | metric current > metric sample               = [current]
+  | metric current == metric sample              = current:collection
+  | otherwise                                    = collection
   where metric = infoDepth
 
 -- will eliminate hidden directories from recursion, but the `.` dir
@@ -29,8 +31,4 @@ visible = fileName /~? ".?*"
 
 main = do
   skip <- getArgs
-  result <- fold (filterPredicate skip) folding Nothing "."
-  case result of
-    Just info -> putStrLn (infoPath info)
-    Nothing -> putStrLn "."
-  
+  mapM_ putStrLn . fmap infoPath =<< fold (filterPredicate skip) folding [] "."
